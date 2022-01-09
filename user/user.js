@@ -1,10 +1,12 @@
 const { executeRequest } = require('./../database/database_utils');
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+const PASSPHRASE = process.env.PASSPHRASE;
 
 const tableToUse = 'users';
 
-function tryToLogin(username, password, callback) {
-    let sql = `SELECT * FROM ${tableToUse} WHERE username = '${username}' LIMIT 1`;
+function tryToLogin(email, password, callback) {
+    let sql = `SELECT * FROM ${tableToUse} WHERE email = '${email}' LIMIT 1`;
     executeRequest(sql, (err, rows) => {
         if (err) {
             callback(err, null);
@@ -14,8 +16,16 @@ function tryToLogin(username, password, callback) {
             } else {
                 comparePassword(password, rows[0].password)
                     .then(async () => {
-                        let user = "good";
-                        callback(null, user);
+                        const token = jwt.sign({
+                            id: rows[0].id,
+                            email: rows[0].email
+                        }, PASSPHRASE, { expiresIn: '60000' });
+                        const user = {
+                            id: rows[0].id,
+                            email: rows[0].email,
+                            username : rows[0].username
+                        }
+                        callback(null, { token, user });
                     })
                     .catch(err => {
                         callback(err, null);

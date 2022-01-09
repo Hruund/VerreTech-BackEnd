@@ -12,6 +12,21 @@ app.use(cors(corsOption))
 
 const { executeRequest } = require('./database/database_utils')
 
+app.get('/', (req, res) => {
+  res.send('YA RIEN ICI');
+})
+
+app.get('api/cart/:id', (req, res) => {
+  const sql = `SELECT * FROM cart WHERE user_id = ${req.params.id}`
+  executeRequest(sql, (err, rows) => {
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      res.status(200).send(rows)
+    }
+  })
+})
+
 app.get('/api/products', (req, res) => {
   executeRequest('SELECT * FROM product', (err, rows) => {
     console.log(err);
@@ -21,18 +36,16 @@ app.get('/api/products', (req, res) => {
 
 const { tryToLogin } = require('./user/user')
 
-app.post('/login', (req, res) => {
-  let username = req.query.username;
+app.post('/api/login', (req, res) => {
+  let email = req.query.email;
   let password = req.query.password;
-  tryToLogin(username, password, (err, user) => {
+  tryToLogin(email, password, (err, return_object) => {
     if (err) {
       res.json({
-        error: err
+        message : err
       })
     } else {
-      res.json({
-        user: user
-      })
+      res.json({ message: "success",access_token: return_object.token, user : return_object.user })
     }
   });
 })
@@ -46,11 +59,11 @@ app.post('/register', (req, res) => {
   tryToRegister({username, password, email}, (err, user) => {
     if(err) {
       res.json({
-        error: err
+        message: err
       })
     } else {
       res.json({
-        user: user
+        message: "success"
       })
     }
   });

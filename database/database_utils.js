@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+const res = require('express/lib/response');
 dotenv.config();
 const mysql = require('mysql2')
 const db = mysql.createConnection({
@@ -11,14 +12,17 @@ const db = mysql.createConnection({
 function executeRequest(sql, callback) {
     db.connect(function (err) {
         if (err){
-            console.log("TOTO")
             throw err;
         }
         db.query(sql, function (err, result) {
             if (err) {
                 callback(err, null);
             } else {
-                callback(null, result);
+                if(result.length === 0) {
+                    callback("empty", null);
+                }else{
+                    callback(null, result);
+                }
             }
         });
     });
