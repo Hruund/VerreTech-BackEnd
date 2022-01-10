@@ -53,6 +53,33 @@ app.post('/api/login', (req, res) => {
   });
 })
 
+app.post('/api/addProduct', (req, res) => {
+  console.log(req.query);
+  let name = req.query.name;
+  let price = parseFloat(req.query.price);
+  let description = req.query.feature;
+  let id_categorie = req.query.id_categorie;
+  let image = req.query.image;
+  //test name,price,description,id_categorie are not null
+  if (name == null || price == null || description == null || id_categorie == null || image == null) {
+    res.json({
+      message: "name,price,description,id_categorie are null"
+    })
+    return;
+  }
+  // let image = req.query.image;
+  let sql = `INSERT INTO product (name, price, feature, image, id_categorie) VALUES ('${name}', '${price}', '${description}', '${image}', ${id_categorie})`;
+  executeRequest(sql, (err, rows) => {
+    if (err) {
+      res.json({
+        message : err
+      })
+    } else {
+      res.json({ message: "success" })
+    }
+  });
+})
+
 const { tryToRegister } = require('./user/user')
 
 app.post('/api/register', (req, res) => {
@@ -70,6 +97,74 @@ app.post('/api/register', (req, res) => {
       })
     }
   });
+})
+
+
+app.get('/api/product/:id', (req, res) => {
+  let id = req.params.id;
+  if(id == null) {
+    res.json({
+      message: "id is null"
+    })
+    return;
+  }
+  let sql = `SELECT * FROM product WHERE id = ${id}`;
+  executeRequest(sql, (err, rows) => {
+    if (err) {
+      res.json({
+        message : err
+      })
+    } else {
+      res.json(rows[0])
+    }
+  });
+})
+
+app.put('/api/product/:id', (req, res) => {
+  let id = req.params.id;
+  let name = req.query.name;
+  let price = parseFloat(req.query.price);
+  let description = req.query.feature;
+  let id_categorie = req.query.id_categorie;
+  let image = req.query.image;
+  //test name,price,description,id_categorie are not null
+  if (name == null || price == null || description == null || id_categorie == null || image == null) {
+    res.json({
+      message: "name,price,description,id_categorie are null"
+    })
+    return;
+  }
+  let sql = `UPDATE product SET name = '${name}', price = '${price}', feature = '${description}', image = '${image}', id_categorie = ${id_categorie} WHERE id = ${id}`;
+  executeRequest(sql, (err, rows) => {
+    if (err) {
+      res.json({
+        message : err
+      })
+    } else {
+      res.json({ message: "success" })
+    }
+  });
+})
+
+app.delete('/api/product/:id',(req,res) => {
+  let id = req.params.id;
+  if (id == null) {
+    res.json({
+      message: "id is null"
+    })
+    return;
+  }
+  let sql = `DELETE FROM product WHERE id = ${id}`;
+  executeRequest(sql, (err, rows) => {
+    if (err) {
+      res.json({
+        message : err
+      })
+    } else {
+      res.json({ message: "success" })
+    }
+  });
+  
 })
 
 app.post('/api/checkToken', (req, res) => {
