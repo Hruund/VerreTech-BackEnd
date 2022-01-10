@@ -39,6 +39,7 @@ function tryToRegister(paramsObject,callback) {
     let sql = `SELECT * FROM ${tableToUse} WHERE email = '${paramsObject.email}'`;
     executeRequest(sql, (err, rows) => {
         if (err) {
+            console.log("error : ", err);
             callback(err, null);
         } else {
             if (rows.length === 0) {
@@ -58,7 +59,7 @@ function tryToRegister(paramsObject,callback) {
                         callback(err, null);
                     });
             } else {
-                callback(null, null);
+                callback("already used", null);
             }
         }
     });

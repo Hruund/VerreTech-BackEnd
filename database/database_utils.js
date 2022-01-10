@@ -18,11 +18,7 @@ function executeRequest(sql, callback) {
             if (err) {
                 callback(err, null);
             } else {
-                if(result.length === 0) {
-                    callback("empty", null);
-                }else{
-                    callback(null, result);
-                }
+                callback(null, result);
             }
         });
     });

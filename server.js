@@ -19,6 +19,7 @@ app.get('/', (req, res) => {
   res.send('YA RIEN ICI');
 })
 
+/***** CART *****/
 app.get('api/cart/:id', (req, res) => {
   const sql = `SELECT * FROM cart WHERE user_id = ${req.params.id}`
   executeRequest(sql, (err, rows) => {
@@ -30,13 +31,7 @@ app.get('api/cart/:id', (req, res) => {
   })
 })
 
-app.get('/api/products', (req, res) => {
-  executeRequest('SELECT * FROM product', (err, rows) => {
-    console.log(err);
-    res.json(rows);
-  });
-})
-
+/***** USER *****/
 const { tryToLogin } = require('./user/user')
 
 app.post('/api/login', (req, res) => {
@@ -49,6 +44,53 @@ app.post('/api/login', (req, res) => {
       })
     } else {
       res.json({ message: "success",access_token: return_object.token, user : return_object.user })
+    }
+  });
+})
+
+const { tryToRegister } = require('./user/user')
+
+app.post('/api/register', (req, res) => { //TODO entrer les autres données!!!
+  let username = req.query.lastname + "." + req.query.firstname;
+  let password = req.query.password;
+  let email = req.query.email;
+  tryToRegister({username, password, email}, (err, user) => {
+    if(err) {
+      res.json({
+        message: err
+      })
+    } else {
+      res.json({
+        message: "success"
+      })
+    }
+  });
+})
+
+/***** PRODUCT *****/
+app.get('/api/products', (req, res) => {
+  executeRequest('SELECT * FROM product', (err, rows) => {
+    console.log(err);
+    res.json(rows);
+  });
+})
+
+app.get('/api/product/:id', (req, res) => {
+  let id = req.params.id;
+  if(id == null) {
+    res.json({
+      message: "id is null"
+    })
+    return;
+  }
+  let sql = `SELECT * FROM product WHERE id = ${id}`;
+  executeRequest(sql, (err, rows) => {
+    if (err) {
+      res.json({
+        message : err
+      })
+    } else {
+      res.json(rows[0])
     }
   });
 })
@@ -67,55 +109,14 @@ app.post('/api/addProduct', (req, res) => {
     })
     return;
   }
-  // let image = req.query.image;
   let sql = `INSERT INTO product (name, price, feature, image, id_categorie) VALUES ('${name}', '${price}', '${description}', '${image}', ${id_categorie})`;
   executeRequest(sql, (err, rows) => {
     if (err) {
       res.json({
-        message : err
-      })
-    } else {
-      res.json({ message: "success" })
-    }
-  });
-})
-
-const { tryToRegister } = require('./user/user')
-
-app.post('/api/register', (req, res) => {
-  let username = req.query.username;
-  let password = req.query.password;
-  let email = req.query.email;
-  tryToRegister({username, password, email}, (err, user) => {
-    if(err) {
-      res.json({
         message: err
       })
     } else {
-      res.json({
-        message: "success"
-      })
-    }
-  });
-})
-
-
-app.get('/api/product/:id', (req, res) => {
-  let id = req.params.id;
-  if(id == null) {
-    res.json({
-      message: "id is null"
-    })
-    return;
-  }
-  let sql = `SELECT * FROM product WHERE id = ${id}`;
-  executeRequest(sql, (err, rows) => {
-    if (err) {
-      res.json({
-        message : err
-      })
-    } else {
-      res.json(rows[0])
+      res.json({ message: "success" })
     }
   });
 })
@@ -167,6 +168,7 @@ app.delete('/api/product/:id',(req,res) => {
   
 })
 
+/***** TOKEN *****/
 app.post('/api/checkToken', (req, res) => {
   const token = req.query.access_token;
   if(typeof token != "undefined" && token != ""){
@@ -191,5 +193,5 @@ app.post('/api/checkToken', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`Adresse du serveur :  http://localhost:${port}`)
 })
