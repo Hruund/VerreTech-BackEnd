@@ -4,6 +4,9 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT
 
+const jwt = require("jsonwebtoken");
+const PASSPHRASE = process.env.PASSPHRASE;
+
 const cors = require('cors')
 const corsOption = {
   origin: '*'
@@ -52,7 +55,7 @@ app.post('/api/login', (req, res) => {
 
 const { tryToRegister } = require('./user/user')
 
-app.post('/register', (req, res) => {
+app.post('/api/register', (req, res) => {
   let username = req.query.username;
   let password = req.query.password;
   let email = req.query.email;
@@ -67,6 +70,29 @@ app.post('/register', (req, res) => {
       })
     }
   });
+})
+
+app.post('/api/checkToken', (req, res) => {
+  const token = req.query.access_token;
+  if(typeof token != "undefined" && token != ""){
+    const decoded = jwt.decode(token, PASSPHRASE, { complete: false });
+    if( decoded.id == req.query.id && decoded.email == req.query.email ) {
+      res.status(200).json({ 
+        content: decoded,
+        message: "success"
+       });
+    } else {
+      res.status(500).json({ 
+        error: "Unable to verify this token",
+        message: "failure"
+     })
+    }
+  }else{
+    res.status(500).json({
+      error: "Unable to verify this token",
+      message: "failure"
+    })
+  }
 })
 
 app.listen(port, () => {
