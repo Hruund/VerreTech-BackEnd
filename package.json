@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "jest",
+    "test:cov": "jest --coverage",
+    "test:covreport": "jest --coverage --coverageDirectory=output/coverage/jest"
   },
   "author": "",
   "license": "ISC",
