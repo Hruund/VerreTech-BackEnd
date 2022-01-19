@@ -21,8 +21,10 @@ app.get('/', (req, res) => {
 
 /***** CART *****/
 app.get('/api/cart/:id', (req, res) => {
+  console.log("DEBUT GET CART FROM USER : ", req.params.id);
   const sql = `SELECT * FROM cart_product WHERE id_cart = (SELECT id FROM cart WHERE id_user = ${req.params.id})`;
   executeRequest(sql, (err, rows) => {
+    console.log("FIN GET CART FROM USER : ", rows);
     if (err) {
       res.json({
         message : "error",

@@ -12,7 +12,7 @@ function tryToLogin(email, password, callback) {
             callback(err, null);
         } else {
             if (rows.length === 0) {
-                callback(null, null);
+                callback("AUCUN UTILISATEUR", null);
             } else {
                 comparePassword(password, rows[0].password)
                     .then(async () => {
