@@ -9,7 +9,7 @@ function tryToLogin(email, password, callback) {
     let sql = `SELECT * FROM ${tableToUse} WHERE email = '${email}' LIMIT 1`;
     executeRequest(sql, (err, rows) => {
         if (err) {
-            callback("1", null);
+            callback(err, null);
         } else {
             if (rows.length === 0) {
                 callback("AUCUN UTILISATEUR", null);
@@ -28,7 +28,7 @@ function tryToLogin(email, password, callback) {
                         callback(null, { token, user });
                     })
                     .catch(err => {
-                        callback("2", null);
+                        callback(err, null);
                     });
             }
         }
