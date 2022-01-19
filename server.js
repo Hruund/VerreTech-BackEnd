@@ -128,6 +128,25 @@ app.get('/api/products', (req, res) => {
   });
 })
 
+app.get('/api/products/filterCategories/:idCategorie', (req, res) => {
+  executeRequest(`SELECT * FROM product WHERE id_categorie = ${req.params.idCategorie}`, (err, rows) => {
+    console.log(err);
+    res.json(rows);
+  });
+})
+app.get('/api/products/filterName/:name', (req, res) => {
+  executeRequest(`SELECT * FROM product WHERE name LIKE '%${req.params.name}%'`, (err, rows) => {
+    console.log(err);
+    res.json(rows);
+  });
+})
+app.get('/api/products/filterPrice/:price', (req, res) => {
+  executeRequest(`SELECT * FROM product WHERE price <= ${req.params.price}`, (err, rows) => {
+    console.log(err);
+    res.json(rows);
+  });
+})
+
 app.get('/api/product/:id', (req, res) => {
   let id = req.params.id;
   if(id == null) {
@@ -149,7 +168,6 @@ app.get('/api/product/:id', (req, res) => {
 })
 
 app.post('/api/addProduct', (req, res) => {
-  console.log(req.query);
   let name = req.query.name;
   let price = parseFloat(req.query.price);
   let description = req.query.feature;
