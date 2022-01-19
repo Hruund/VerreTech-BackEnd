@@ -50,8 +50,15 @@ function tryToRegister(paramsObject,callback) {
                             if (err) {
                                 callback(err, null);
                             } else {
-                                let user = "good";
-                                callback(null, user);
+                                sql = `INSERT INTO cart (user_id) VALUES (${rows.insertId})`;
+                                executeRequest(sql, (err, rows) => {
+                                    if (err) {
+                                        callback(err, null);
+                                    } else {
+                                        let user = "good";
+                                        callback(null, user);
+                                    }
+                                })
                             }
                         });
                     })
