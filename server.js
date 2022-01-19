@@ -93,7 +93,8 @@ app.post('/api/login', (req, res) => {
   tryToLogin(email, password, (err, return_object) => {
     if (err) {
       res.json({
-        message : err
+        message: "error",
+        error: err
       })
     } else {
       res.json({ message: "success",access_token: return_object.token, user : return_object.user })
