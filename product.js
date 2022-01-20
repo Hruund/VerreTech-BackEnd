@@ -22,26 +22,34 @@ app.get('/', (req, res) => {
 /***** PRODUCT *****/
 app.get('/api/products', (req, res) => {
     executeRequest('SELECT * FROM product', (err, rows) => {
-        console.log(err);
+        if(err != null) {
+            console.log(err);
+        }
         res.json(rows);
     });
 })
 
 app.get('/api/products/filterCategories/:idCategorie', (req, res) => {
     executeRequest(`SELECT * FROM product WHERE id_categorie = ${req.params.idCategorie}`, (err, rows) => {
-        console.log(err);
+        if(err != null) {
+            console.log(err);
+        }
         res.json(rows);
     });
 })
 app.get('/api/products/filterName/:name', (req, res) => {
     executeRequest(`SELECT * FROM product WHERE name LIKE '%${req.params.name}%'`, (err, rows) => {
-        console.log(err);
+        if(err != null) {
+            console.log(err);
+        }
         res.json(rows);
     });
 })
 app.get('/api/products/filterPrice/:price', (req, res) => {
     executeRequest(`SELECT * FROM product WHERE price <= ${req.params.price}`, (err, rows) => {
-        console.log(err);
+        if(err != null) {
+            console.log(err);
+        }
         res.json(rows);
     });
 })
