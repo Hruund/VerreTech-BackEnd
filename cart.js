@@ -86,5 +86,5 @@ app.delete('/api/cart/:id/:idproduct', (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Adresse du serveur :  http://localhost:${port}`)
+    console.log(`Adresse du serveur :  http://localhost:7000`)
 })
