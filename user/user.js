@@ -45,7 +45,7 @@ function tryToRegister(paramsObject,callback) {
             if (rows.length === 0) {
                 bcrypt.hash(paramsObject.password, 10)
                     .then(hash => { 
-                        let sql = `INSERT INTO ${tableToUse} (username, password, email) VALUES ('${paramsObject.username}', '${hash}', '${paramsObject.email}')`;
+                        let sql = `INSERT INTO ${tableToUse} (username, password, email,nom,prenom,user_adress,user_postal_code,user_city,user_phone) VALUES ('${paramsObject.username}', '${hash}', '${paramsObject.email}, '${paramsObject.nom}', '${paramsObject.prenom}', '${paramsObject.user_adress}', '${paramsObject.user_postal_code}', '${paramsObject.user_city}', '${paramsObject.user_phone}')`;
                         executeRequest(sql, (err, rows) => {
                             if (err) {
                                 callback(err, null);
