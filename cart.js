@@ -166,7 +166,9 @@ async function getEveryProduct(rows){
     //     products.push(result);
     // });
     for(const element of rows){
+        console.log(element);
         let result = await getProduct(element);
+        result[0].quantity = element.quantity;
         products.push(result);
     }
     return products;
@@ -192,7 +194,8 @@ async function getProduct(element){
     })
 }
 
-const { getUserInfo } = require('./user/user')
+const { getUserInfo } = require('./user/user');
+const res = require('express/lib/response');
 app.get('/api/carts/validate/:id',(req,res)=>{
     var id = req.params.id;
     var access_token = req.query.access_token;
