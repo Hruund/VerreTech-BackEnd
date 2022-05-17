@@ -24,4 +24,4 @@ function executeRequest(sql, callback) {
     });
 }
 
-module.exports = { executeRequest }; //pq sa veut pas push
+module.exports = { executeRequest };

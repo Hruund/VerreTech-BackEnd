@@ -39,11 +39,23 @@ app.post('/api/login', (req, res) => {
 
 const { tryToRegister } = require('./user/user')
 
-app.post('/api/register', (req, res) => { //TODO entrer les autres données!!!
-    let username = req.query.lastname + "." + req.query.firstname;
-    let password = req.query.password;
-    let email = req.query.email;
-    tryToRegister({ username, password, email }, (err, user) => {
+app.post('/api/register', (req, res) => {
+
+    const objectToSend = {
+        username : req.query.lastname + "." + req.query.firstname,
+        email : req.query.email,
+        password : req.query.password,
+
+        nom : req.query.lastname,
+        prenom : req.query.firstname,
+
+        user_adress : req.query.address,
+        user_postal_code: req.query.addressCP,
+        user_city : req.query.city,
+        user_phone: req.query.number,
+    };
+
+    tryToRegister(objectToSend, (err, user) => {
         if (err) {
             res.json({
                 message: err
@@ -54,6 +66,30 @@ app.post('/api/register', (req, res) => { //TODO entrer les autres données!!!
             })
         }
     });
+})
+
+
+const { getUserInfo } = require('./user/user')
+app.get('/api/user/:id', (req, res) => {
+    const requestID = req.params.id;
+    const Token = req.query.access_token;
+    const params = {
+        id: requestID,
+        token : Token
+    };
+    getUserInfo(params, (err, user) => {
+        if (err) {
+            res.json({
+                message: err
+            })
+        } else {
+            res.json({
+                message: "success",
+                user: user
+            })
+        }
+    });
+        
 })
 
 app.listen(port, () => {
