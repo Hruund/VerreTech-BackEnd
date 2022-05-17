@@ -192,6 +192,144 @@ async function getProduct(element){
     })
 }
 
+const { getUserInfo } = require('./user/user')
+app.get('/api/carts/validate/:id',(req,res)=>{
+    var id = req.params.id;
+    var access_token = req.query.access_token;
+    const params = {
+        id: id,
+        token: access_token
+    };
+    // //identifier l'utilisateur
+    getUserInfo(params, (err, user) => {
+        if (err) {
+            res.json({
+                message: "error",
+                error: err
+            })
+        } else {
+            //récuperer les produits qu'y été dans le panier
+            var sql = 'SELECT * FROM product WHERE id IN (SELECT id_product FROM cart_product WHERE id_cart = (SELECT id FROM cart WHERE id_user = ' + user.id + '))';
+            executeRequest(sql, (err, rows) => {
+                if (err) {
+                    res.json({
+                        message: "error",
+                        error: err
+                    })
+                } else {
+                    //récuperer les quantités qu'y été dans le panier
+                    var sql2 = 'SELECT id_product,quantity FROM cart_product WHERE id_cart = (SELECT id FROM cart WHERE id_user = ' + user.id + ')';
+                    executeRequest(sql2, (err, rows2) => {
+                        if (err) {
+                            res.json({
+                                message: "error",
+                                error: err
+                            })
+                        } else {
+                            var merged = mergeArray(rows, rows2);
+                            var totalPrice = getTotalPrice(merged);
+                            //le mettre dans la table order_list
+                            var sql3 = 'INSERT INTO order_table (id_client,date,date_maj,price,shop,state) VALUES (' + user.id + ',NOW(),NOW(),' + totalPrice +',"aucun",0)';
+                            console.log("sql3 ",sql3);
+                            executeRequest(sql3, (err, rows3) => {
+                                if (err) {
+                                    console.log("err sql3", rows3);
+                                    res.json({
+                                        message: "error",
+                                        error: err
+                                    })
+                                } else {
+                                    var sql4 = 'SELECT id FROM order_table WHERE id_client = ' + user.id + ' AND date = NOW()';
+                                    console.log("sql4 ",sql4);
+                                    executeRequest(sql4,async (err, rows4) => {
+                                        if (err) {
+                                            res.json({
+                                                message: "error",
+                                                error: err
+                                            })
+                                        } else {
+                                            for (var i = 0; i < merged.length; i++) {
+                                                var sql5 = 'INSERT INTO order_list (order_table_id,product_id,quantity) VALUES (' + rows4[0].id + ',' + merged[i].id+','+merged[i].quantity+')';
+                                                console.log("sql5 ", sql5);
+                                                await new Promise((resolve, reject) => {
+                                                    executeRequest(sql5, (err, rows5) => {
+                                                        if (err) {
+                                                            res.json({
+                                                                message: "error",
+                                                                error: err
+                                                            })
+                                                            reject();
+                                                        } else {
+                                                        resolve();
+                                                        console.log("ok");
+                                                        }
+                                                    })
+                                                })
+                                                .then(function(result){
+                                                    console.log("ok");
+                                                }).catch(function(err){
+                                                    console.log("err");
+                                                });
+                                            }
+                                            //supprimer le panier
+                                            var sql6 = 'DELETE FROM cart_product WHERE id_cart = (SELECT id FROM cart WHERE id_user = ' + user.id + ')';
+                                            executeRequest(sql6, (err, rows6) => {
+                                                if (err) {
+                                                    res.json({
+                                                        message: "error",
+                                                        error: err
+                                                    })
+                                                } else {
+                                                    res.json({
+                                                        message: "success",
+                                                        order: rows4[0],
+                                                        products: merged
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        }});
+                    }});
+
+            // //vider le panier de l'utilisateur
+            // clearUserCart(req.params.id);
+            // //retourner un message de succès
+        }
+    });
+   
+})
+
+function mergeArray(array1,array2){
+    var result = [];
+    for(var i = 0; i < array1.length; i++){
+        result.push(array1[i]);
+    }
+    for(var i = 0; i < array2.length; i++){
+        let nodoublon = false;
+        for(var t = 0; t < array1.length; t++){
+            if(array1[t].id == array2[i].id_product){
+                result[t].quantity = array2[i].quantity;
+                nodoublon = true;
+            }
+        }
+        if(!nodoublon){
+            result.push(array2[i]);
+        }
+    }
+    return result;
+}
+
+function getTotalPrice(array){
+    var totalPrice = 0;
+    for(var i = 0; i < array.length; i++){
+        totalPrice += array[i].price * array[i].quantity;
+    }
+    return totalPrice;
+}
+
 app.listen(port, () => {
     console.log(`Adresse du serveur :  http://localhost:${port}`)
 })
