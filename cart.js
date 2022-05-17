@@ -1,13 +1,13 @@
 const dotenv = require('dotenv');
-dotenv.config();
+//dotenv.config();
+dotenv.config({ path: process.cwd() + '/.env' });
 const express = require('express')
 const app = express()
 const port = process.env.PORT_CART
-console.log(process.env.PORT_CART)
-console.log(port)
+
 const jwt = require("jsonwebtoken");
 const PASSPHRASE = process.env.PASSPHRASE;
-console.log(PASSPHRASE)
+
 const cors = require('cors')
 const corsOption = {
     origin: '*'
