@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express')
 const app = express()
-const port = process.env.PORT_USER
+const port = process.env.PORT_USER || 6500
 
 const jwt = require("jsonwebtoken");
 const PASSPHRASE = process.env.PASSPHRASE;
