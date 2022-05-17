@@ -84,6 +84,113 @@ app.delete('/api/cart/:id/:idproduct', (req, res) => {
         }
     })
 })
+app.get('/api/cart/orders/:id', (req, res) => {
+    try{
+        let sql = `SELECT * FROM order_table WHERE id_client = ${req.params.id}`
+        executeRequest(sql, (err, rows) => {
+            if (err) {
+                res.json({
+                    message: "error",
+                    error: err
+                })
+            } else {
+                let sql2 = `SELECT * FROM order_list WHERE order_table_id IN (SELECT id FROM order_table WHERE id_client = ${req.params.id})`
+                executeRequest(sql2, (err, rows2) => {
+                    if (err) {
+                        res.json({
+                            message: "error",
+                            error: err
+                        })
+                    } else {
+                        res.json({
+                            message: "success",
+                            orders: rows2,
+                            order_table: rows
+                        })
+                    }
+                })
+                // res.json({
+                //     message: "success",
+                //     orders: rows
+                // })
+            }
+        })
+    }catch(e){
+        res.json({
+            message: "error",
+            error: e
+        })    
+    }
+})
+app.get('/api/cart/order/:id',(req,res)=>{
+    try{
+        let sql = `SELECT * FROM order_table WHERE id = ${req.params.id}`
+        executeRequest(sql, (err, rows) => {
+            if (err) {
+                res.json({
+                    message: "error",
+                    error: err
+                })
+            }else{
+                let sql2 = `SELECT * FROM order_list WHERE order_table_id = ${req.params.id}`
+                executeRequest(sql2, async (err, rows2) => {
+                    if (err) {
+                        res.json({
+                            message: "error",
+                            error: err
+                        })
+                    }else{
+                        let productList = await getEveryProduct(rows2);
+                        res.json({
+                            message: "success",
+                            order: rows[0],
+                            products: productList
+                        })
+                    }
+                })
+            }
+        });
+    }catch(err){
+        res.json({
+            message: "error",
+            error: err
+        })
+    }
+})
+
+async function getEveryProduct(rows){
+    let products = [];
+    // rows.forEach(async (element) => {
+    //     let result = await getProduct(element);
+    //     products.push(result);
+    // });
+    for(const element of rows){
+        let result = await getProduct(element);
+        products.push(result);
+    }
+    return products;
+}
+
+async function getProduct(element){
+    let productList = [];
+    let sql3 = `SELECT * FROM product WHERE id = ${element.product_id}`;
+    var foo = new Promise((resolve, reject) => {
+        executeRequest(sql3, (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                productList.push(rows[0]);
+                resolve(productList);
+            }
+        });
+    });
+    return foo.then(function(result){
+        return result;
+    }).catch(function(err){
+        // console.log("foo catch : ",err);
+        return;
+    })
+}
 
 app.listen(port, () => {
     console.log(`Adresse du serveur :  http://localhost:${port}`)

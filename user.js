@@ -68,6 +68,30 @@ app.post('/api/register', (req, res) => {
     });
 })
 
+
+const { getUserInfo } = require('./user/user')
+app.get('/api/user/:id', (req, res) => {
+    const requestID = req.params.id;
+    const Token = req.query.access_token;
+    const params = {
+        id: requestID,
+        token : Token
+    };
+    getUserInfo(params, (err, user) => {
+        if (err) {
+            res.json({
+                message: err
+            })
+        } else {
+            res.json({
+                message: "success",
+                user: user
+            })
+        }
+    });
+        
+})
+
 app.listen(port, () => {
     console.log(`Adresse du serveur :  http://localhost:${port}`)
 })
