@@ -166,7 +166,6 @@ async function getEveryProduct(rows){
     //     products.push(result);
     // });
     for(const element of rows){
-        console.log(element);
         let result = await getProduct(element);
         result[0].quantity = element.quantity;
         products.push(result);
