@@ -80,14 +80,15 @@ app.post('/api/addProduct', (req, res) => {
     let description = req.query.feature;
     let id_categorie = req.query.id_categorie;
     let image = req.query.image;
+    let quantity = req.query.quantity
     //test name,price,description,id_categorie are not null
-    if (name == null || price == null || description == null || id_categorie == null || image == null) {
+    if (name == null || price == null || description == null || id_categorie == null || image == null || quantity == null) {
         res.json({
-            message: "name,price,description,id_categorie are null"
+            message: "name,price,description,id_categorie,quantity are null"
         })
         return;
     }
-    let sql = `INSERT INTO product (name, price, feature, image, id_categorie) VALUES ('${name}', '${price}', '${description}', '${image}', ${id_categorie})`;
+    let sql = `INSERT INTO product (name, price, quantity, feature, image, id_categorie) VALUES ('${name}', '${price}', '${quantity}', '${description}', '${image}', ${id_categorie})`;
     executeRequest(sql, (err, rows) => {
         if (err) {
             res.json({
@@ -104,16 +105,17 @@ app.put('/api/product/:id', (req, res) => {
     let name = req.query.name;
     let price = parseFloat(req.query.price);
     let description = req.query.feature;
+    let quantity = parseFloat(req.query.quantity);
     let id_categorie = req.query.id_categorie;
     let image = req.query.image;
     //test name,price,description,id_categorie are not null
-    if (name == null || price == null || description == null || id_categorie == null || image == null) {
+    if (name == null || price == null || description == null || id_categorie == null || image == null || quantity == null) {
         res.json({
             message: "name,price,description,id_categorie are null"
         })
         return;
     }
-    let sql = `UPDATE product SET name = '${name}', price = '${price}', feature = '${description}', image = '${image}', id_categorie = ${id_categorie} WHERE id = ${id}`;
+    let sql = `UPDATE product SET name = '${name}', price = '${price}', quantity = '${quantity}', feature = '${description}', image = '${image}', id_categorie = ${id_categorie} WHERE id = ${id}`;
     executeRequest(sql, (err, rows) => {
         if (err) {
             res.json({
