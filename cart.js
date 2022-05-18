@@ -276,6 +276,7 @@ app.get('/api/carts/validate/:id',(req,res)=>{
                                                         error: err
                                                     })
                                                 } else {
+                                                    //TODO retirer 1 a la quantité des articles commandé
                                                     res.json({
                                                         message: "success",
                                                         order: rows4[0],
