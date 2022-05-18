@@ -249,7 +249,15 @@ app.get('/api/carts/validate/:id',(req,res)=>{
                                         } else {
                                             for (var i = 0; i < merged.length; i++) {
                                                 var sql5 = 'INSERT INTO order_list (order_table_id,product_id,quantity) VALUES (' + rows4[0].id + ',' + merged[i].id+','+merged[i].quantity+')';
+                                                var sql7 = 'UPDATE product SET quantity = quantity - ' + merged[i].quantity + ' WHERE id = ' + merged[i].id;
                                                 await new Promise((resolve, reject) => {
+                                                    executeRequest(sql7, (err, rows7) => {
+                                                        if(err){
+
+                                                        }else{
+
+                                                        }
+                                                    });
                                                     executeRequest(sql5, (err, rows5) => {
                                                         if (err) {
                                                             res.json({
@@ -276,7 +284,6 @@ app.get('/api/carts/validate/:id',(req,res)=>{
                                                         error: err
                                                     })
                                                 } else {
-                                                    //TODO retirer 1 a la quantité des articles commandé
                                                     res.json({
                                                         message: "success",
                                                         order: rows4[0],
